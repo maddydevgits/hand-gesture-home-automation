@@ -3,8 +3,9 @@ import mediapipe as mp
 import pickle
 import numpy as np
 import serial
+import time
 
-ser=serial.Serial('COM3',9600,timeout=0.5)
+ser=serial.Serial('COM7',9600,timeout=0.5)
 ser.close()
 ser.open()
 
@@ -65,8 +66,8 @@ with mp_hands.Hands(
               data.append(normalizedLandmark.z)
         print(len(data))
         out=model.predict([data])
-        print(out)
-        image=cv2.flip(image,1)
+        print(out[0])
+        #image=cv2.flip(image,1)
 
         font = cv2.FONT_HERSHEY_SIMPLEX
   
@@ -86,35 +87,46 @@ with mp_hands.Hands(
         image = cv2.putText(image, out[0], org, font, 
                    fontScale, color, thickness, cv2.LINE_AA)
         
-        if out[0]=='Gesture1':
+        if out[0]==' Gesture1':
           gesture1Flag+=1
           gesture2Flag=0
           gesture3Flag=0
           gesture4Flag=0
-        elif out[0]=='Gesture2':
+        elif out[0]==' Gesture2':
           gesture1Flag=0
           gesture2Flag+=1
           gesture3Flag=0
           gesture4Flag=0
-        elif out[0]=='Gesture3':
+        elif out[0]==' Gesture3':
           gesture1Flag=0
           gesture2Flag=0
           gesture3Flag+=1
           gesture4Flag=0
-        elif out[0]=='Gesture4':
+        elif out[0]==' Gesture4':
           gesture1Flag=0
           gesture2Flag=0
           gesture3Flag=0
           gesture4Flag+=1
         
         if gesture1Flag==1:
+          print('bulb1on')
+          time.sleep(1)
           ser.write('bulb1on'.encode('utf-8'))
+          #gesture1Flag=0
         elif gesture2Flag==1:
+          print('bulb1off')
+          time.sleep(1)
           ser.write('bulb1off'.encode('utf-8'))
+          #gesture2Flag=0
         elif gesture3Flag==1:
+          print('bulb2 on')
+          time.sleep(1)
           ser.write('bulb2on'.encode('utf-8'))
+          #gesture3Flag=0
         elif gesture4Flag==1:
+          print('bulb2 off')
           ser.write('bulb2off'.encode('utf-8'))
+          #gesture4Flag=0
 
     # Flip the image horizontally for a selfie-view display.
     cv2.imshow('MediaPipe Hands', image)
